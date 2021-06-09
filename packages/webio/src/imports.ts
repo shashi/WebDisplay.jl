@@ -167,7 +167,7 @@ export const importLink = (url: string, options: {rel?: string, type?: string, m
     return Promise.resolve();
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const link = document.createElement("link");
 
     // Apply options
