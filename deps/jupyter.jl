@@ -133,7 +133,7 @@ function find_path_jupyter_cmd()::Cmd
 end
 
 """
-    find_jupyter_cmd([; conda=false])
+    find_jupyter_cmd([; condajl=false])
 
 Find the most likely candidate for the `jupyter` executable.
 This will locate `jupyter` by searching the `PATH` environment variable and,
@@ -227,10 +227,15 @@ This copies the nbextension code to the appropriate place and writes the
 appropriate configuration files.
 """
 function install_jupyter_nbextension(
-        jupyter::Cmd=find_jupyter_cmd();
+        jupyter=nothing;
+        condajl::Union{Bool,Nothing}=nothing,
         nbextension_flags::Cmd=`--user`,
 )
     install_jupyter_serverextension()
+
+    if jupyter === nothing
+        jupyter = find_jupyter_cmd(; condajl=condajl)
+    end
 
     # Copy the nbextension files.
     install_cmd = `$jupyter nbextension install $nbextension_flags $JUPYTER_NBEXTENSION_PATH`
