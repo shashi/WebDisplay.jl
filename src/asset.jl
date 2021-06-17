@@ -181,19 +181,21 @@ function path2url(path::AbstractString)
             :webio_pkg_urls,
         )
         return path
-    elseif startswith(path, "/assetserver/") && haskey(AssetRegistry.registry, path)
+    # check if file or containing directory has already been registered
+    elseif startswith(path, "/assetserver/") && haskey(AssetRegistry.registry, join(split(path, "/")[1:3],"/"))
         return path
-    elseif isfile(abspath(path))
+    elseif isfile(abspath(path)) || isdir(abspath(path))
         # TODO: this should be implemented in AssetRegistry, not here.
         path = abspath(path)
         # first lookup to see if any of the file itself or any of the parent
         # directories are registered.
-        AssetRegistry.isregistered(path) && AssetRegistry.getkey(path)
+        AssetRegistry.isregistered(path) && return AssetRegistry.getkey(path)
         cur_path = path
         while true
             if AssetRegistry.isregistered(cur_path) && isdir(cur_path)
                 key = AssetRegistry.getkey(cur_path)
-                url = key * "/" * replace(replace(path, cur_path => ""), r"^\/"=>"")
+                #strip cur_path and convert all backslashes to slashes (for windows ;-) )
+                url = key * replace(SubString(path, length(cur_path) + 1, length(path)), "\\" => "/")
                 return url
             end
             cur_path1 = dirname(cur_path)
@@ -220,9 +222,9 @@ there.
 function dep2url(dep::AbstractString)
     # if is an url, we are done :)
     islocal(dep) || return dep
-    query_parts = split(dep, "?") # remove anything after ?
-    file_path = first(query_parts)
-    query_part = length(query_parts) >= 2 ? "?" * query_parts[2] : ""
-    url = path2url(file_path)
-    return string(baseurl[], url, query_part)
+    # split query from url path, including further '?'s
+    url_parts = split(dep, "?")
+    # register the url file without the query part
+    url_parts[1] = path2url(baseurl[] * url_parts[1])
+    return join(url_parts, "?")
 end
