@@ -339,7 +339,7 @@ changes.
 s = Scope()
 obs = Observable(s, "logme", "")
 onjs(
-    s, "logme",
+    obs,
     js"""
     function(newValue) {
         console.log(newValue);
@@ -415,7 +415,7 @@ end
 
 # Setup a JavaScript listener
 onjs(
-    s, "time",
+    time,
     js"""
     function(time) {
         this.dom.querySelector(".current-time").textContent = time;
