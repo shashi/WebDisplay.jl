@@ -62,6 +62,15 @@ using WebIO, IJulia
 WebIO.install_jupyter_labextension()
 ```
 
+If you open IJulia with
+```
+using IJulia; notebook()
+```
+you should install the WebIO extension in the jupyter notebook by running
+```
+WebIO.install_jupyter_nbextension()
+```
+
 ## API Reference
 ```@docs
 WebIO.find_jupyter_cmd
